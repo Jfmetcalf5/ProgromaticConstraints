@@ -29,7 +29,16 @@ class ViewController: UIViewController {
         bottomRightButton.backgroundColor = .green
         
         // Adding targets
-        //        topLeftButton.addTarget(self, action: #selector(<#T##@objc method#>), for: .touchUpInside)
+        topLeftButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        topRightButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        bottomLeftButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        bottomRightButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        
+        // Add targets for exit
+        topLeftButton.addTarget(self, action: #selector(buttonExited(_:)), for: .touchDragExit)
+        topRightButton.addTarget(self, action: #selector(buttonExited(_:)), for: .touchDragExit)
+        bottomLeftButton.addTarget(self, action: #selector(buttonExited(_:)), for: .touchDragExit)
+        bottomRightButton.addTarget(self, action: #selector(buttonExited(_:)), for: .touchDragExit)
         
         // Add the buttons as subviews of the VC's view
         view.addSubview(topLeftButton)
@@ -85,7 +94,38 @@ class ViewController: UIViewController {
     }
     
     // Adding targets (actions) for the buttons
+    @objc func buttonTapped() {
+        // This is like our action
+        let topLeftColor = topLeftButton.backgroundColor
+        let topRightColor = topRightButton.backgroundColor
+        let bottomLeftColor = bottomLeftButton.backgroundColor
+        let bottomRightColor = bottomRightButton.backgroundColor
+        
+        UIView.animate(withDuration: 0.5) {
+            self.topRightButton.backgroundColor = topLeftColor
+            self.bottomLeftButton.backgroundColor = topRightColor
+            self.bottomRightButton.backgroundColor = bottomLeftColor
+            self.topLeftButton.backgroundColor = bottomRightColor
+        }
+    }
+    
     // Adding animation
+    @objc func buttonExited(_ sender: UIButton) {
+        view.bringSubview(toFront: sender)
+        let animation = CAKeyframeAnimation()
+        animation.keyPath = "position.x"
+        animation.values = [ sender.frame.origin.x + sender.frame.width / 2,
+                            sender.frame.origin.x + sender.frame.width / 2 - 15,
+                            sender.frame.origin.x = sender.frame.width / 2,
+                            sender.frame.origin.x = sender.frame.width / 2 - 15,
+                            sender.frame.origin.x = sender.frame.width / 2 ]
+        
+        animation.keyTimes = [0, 0.25, 0.5, 0.75, 1]
+        animation.duration = 5
+        animation.repeatCount = 5
+        
+        sender.layer.add(animation, forKey: "shake")
+    }
     
 }
 
